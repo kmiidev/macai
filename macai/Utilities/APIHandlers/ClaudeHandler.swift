@@ -191,7 +191,6 @@ class ClaudeHandler: APIService {
             "messages": updatedRequestMessages,
             "system": systemMessage,
             "stream": stream,
-            "temperature": temperature,
             "max_tokens": maxTokens,
         ]
 
@@ -199,6 +198,7 @@ class ClaudeHandler: APIService {
 
         return request
     }
+
 
     private func handleAPIResponse(_ response: URLResponse?, data: Data?, error: Error?) -> Result<Data?, APIError> {
         if let error = error {

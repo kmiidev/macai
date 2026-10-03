@@ -195,6 +195,78 @@ final class GeminiHandlerTests: XCTestCase {
     }
 }
 
+final class ClaudeHandlerTests: XCTestCase {
+    override func tearDown() {
+        super.tearDown()
+        URLProtocolStub.requestHandler = nil
+    }
+
+    func testClaudeRequestOmitsTemperature() throws {
+        let payload = try captureRequestPayload(model: "claude-opus-4-7", temperature: 0.7)
+
+        XCTAssertNil(payload["temperature"])
+    }
+
+    func testOlderClaudeRequestAlsoOmitsTemperature() throws {
+        let payload = try captureRequestPayload(model: "claude-opus-4-1", temperature: 0.7)
+
+        XCTAssertNil(payload["temperature"])
+    }
+
+    func testDatedClaudeRequestOmitsTemperature() throws {
+        let payload = try captureRequestPayload(model: "claude-sonnet-4-20250514", temperature: 0.7)
+
+        XCTAssertNil(payload["temperature"])
+    }
+
+    func testClaudeMythosRequestOmitsTemperature() throws {
+        let payload = try captureRequestPayload(model: "claude-mythos-preview", temperature: 0.7)
+
+        XCTAssertNil(payload["temperature"])
+    }
+
+    private func captureRequestPayload(model: String, temperature: Float) throws -> [String: Any] {
+        let expectation = expectation(description: "Claude request captured")
+        var capturedRequest: URLRequest?
+
+        URLProtocolStub.requestHandler = { request in
+            capturedRequest = request
+            let response = HTTPURLResponse(
+                url: request.url ?? URL(string: "https://example.com")!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            let data = Data("{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"ok\"}]}".utf8)
+            return (response, data)
+        }
+
+        let sessionConfig = URLSessionConfiguration.ephemeral
+        sessionConfig.protocolClasses = [URLProtocolStub.self]
+        let session = URLSession(configuration: sessionConfig)
+        let config = APIServiceConfig(
+            name: "Claude",
+            apiUrl: URL(string: "https://api.anthropic.com/v1/messages")!,
+            apiKey: "test-key",
+            model: model
+        )
+        let handler = ClaudeHandler(config: config, session: session)
+
+        handler.sendMessage([["role": "user", "content": "Hi"]], temperature: temperature) { _ in
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 1.0)
+
+        guard let request = capturedRequest,
+              let body = requestBody(from: request),
+              let payload = try JSONSerialization.jsonObject(with: body) as? [String: Any] else {
+            XCTFail("Unable to decode Claude request payload")
+            return [:]
+        }
+        return payload
+    }
+}
+
 private final class URLProtocolStub: URLProtocol {
     static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 

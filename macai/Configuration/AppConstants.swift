@@ -232,15 +232,16 @@ struct AppConstants {
             url: "https://api.anthropic.com/v1/messages",
             apiKeyRef: "https://docs.anthropic.com/en/docs/initial-setup#prerequisites",
             apiModelRef: "https://docs.anthropic.com/en/docs/about-claude/models",
-            defaultModel: "claude-4.1-sonnet",
+            defaultModel: "claude-sonnet-4-5",
             models: [
-                "claude-4.1-sonnet",
-                "claude-4.1-opus",
+                "claude-sonnet-4-5",
+                "claude-opus-4-5",
+                "claude-opus-4-1",
+                "claude-haiku-4-5",
                 "claude-3-5-sonnet-latest",
-                "claude-3-opus-latest",
                 "claude-3-haiku-20240307",
             ],
-            maxTokens: 4096
+            maxTokens: 8192
         ),
         "xai": defaultApiConfiguration(
             name: "xAI",

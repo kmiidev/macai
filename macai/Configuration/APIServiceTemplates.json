@@ -103,11 +103,11 @@
         {
             "id": "claude",
             "displayName": "Claude",
-            "defaultName": "Sonnet 4",
+            "defaultName": "Sonnet 4.5",
             "models": [
                 {
                     "id": "claude-sonnet-4-5-20250929",
-                    "displayName": "Sonnet 4",
+                    "displayName": "Sonnet 4.5",
                     "isDefault": true,
                     "settings": {
                         "generateChatNames": true,

@@ -288,7 +288,7 @@ class ClaudeHandler: APIService {
 
         if let eventType = json["type"] as? String {
             switch eventType {
-            case "contenxt_block_start":
+            case "content_block_start":
                 if let contentBlock = json["content_block"] as? [String: Any],
                     let text = contentBlock["text"] as? String
                 {
